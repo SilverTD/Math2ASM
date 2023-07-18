@@ -4,42 +4,30 @@
 # echo $?
 
 .section .text
-.globl main
+.globl _start
 
-# (2 - 1) + (9 - 3) * 6 + 9 + 10 * (8 - 10) = 26
-main:
-	push %ebp
-	movl %esp, %ebp
+# (6 - 3) + (9 - 3) * 6 = 39
+_start:
+        push %ebp
+        movl %esp, %ebp
 
-	subl $8, %esp
+        subl $4, %esp
 
-	# SUB
-	movl $2, %eax
-	subl $1, %eax
-	movl %eax, -8(%ebp)
+        # SUB
+        movl $6, %eax
+        subl $3, %eax
+        movl %eax, -4(%ebp)
 
-	# SUB
-	movl $9, %eax
-	subl $3, %eax
+        # SUB
+        movl $9, %eax
+        subl $3, %eax
 
-	# MULT
-	imull $6, %eax
-	addl -8(%ebp), %eax
+        # MULT
+        imull $6, %eax
+        addl -4(%ebp), %eax
 
-	# ADD
-	addl $9, %eax
-	movl %eax, -8(%ebp)
+        addl $4, %esp
 
-	# SUB
-	movl $8, %eax
-	subl $10, %eax
-
-	# MULT
-	imull $10, %eax
-	addl -8(%ebp), %eax
-
-	addl $8, %esp
-
-	mov %eax, %ebx
-	movl $1, %eax
-	int $0x80
+        mov %eax, %ebx
+        movl $1, %eax
+        int $0x80
