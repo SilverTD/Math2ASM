@@ -6,44 +6,39 @@
 .section .text
 .globl main
 
+# (2 - 1) + (9 - 3) * 6 + 9 + 10 * (8 - 10) = 26
 main:
 	push %ebp
 	movl %esp, %ebp
 
-	subl $16, %esp
+	subl $8, %esp
 
 	# SUB
-	pushl $2
-	pushl $1
-	popl %eax
-	subl %eax, (%esp)
-	movl %eax, -12(%ebp)
+	movl $2, %eax
+	subl $1, %eax
+	movl %eax, -8(%ebp)
 
-	# ADD
-	pushl $9
-	pushl $3
-	popl %eax
-	addl (%esp), %eax
+	# SUB
+	movl $9, %eax
+	subl $3, %eax
 
 	# MULT
 	imull $6, %eax
-	addl -12(%ebp), %eax
+	addl -8(%ebp), %eax
 
 	# ADD
 	addl $9, %eax
-	movl %eax, -16(%ebp)
+	movl %eax, -8(%ebp)
 
-	# ADD
-	pushl $10
-	pushl $1
-	popl %eax
-	addl (%esp), %eax
+	# SUB
+	movl $8, %eax
+	subl $10, %eax
 
 	# MULT
 	imull $10, %eax
-	addl -16(%ebp), %eax
+	addl -8(%ebp), %eax
 
-	addl $16, %esp
+	addl $8, %esp
 
 	mov %eax, %ebx
 	movl $1, %eax

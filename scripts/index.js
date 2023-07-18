@@ -1,10 +1,10 @@
-const expression = "(2 - 1) + (9 + 3) * 6 + 9 + 10 * (10 + 1)";
+const expression = "(2 - 1) + (9 - 3) * 6 + 9 + 10 * (8 - 10)";
 const tokens = new Lexer(expression).lexer();
 const ast = new Parser(tokens).parse();
 const result = new Visitor(ast).visit();
 console.log(result);
 
-let stack_size = 1;
+let stack_size = 0;
 let store_address = [];
 
 const asm_instruction = {
@@ -22,16 +22,11 @@ function test(ast) {
 	let root = ast;
 
 	if (root.left.value && root.right.value) {
-		++stack_size;
-		const e = ([TOKEN.ADD, TOKEN.MULT, TOKEN.DIV].includes(root.operator)) ? `(%esp), %eax` : `%eax, (%esp)`;
 		const code = trim(`
 			# ${root.operator}
-			pushl $${root.left.value}
-			pushl $${root.right.value}
-			popl %eax
-			${asm_instruction[root.operator]} ${e}
+			movl $${root.left.value}, %eax
+			${asm_instruction[root.operator]} $${root.right.value}, %eax
 		`);
-		store_address.push((stack_size)*4);
 		return code; 
 	} else if (!root.left.value && root.right.value) {
 		const left = test(root.left);
@@ -53,14 +48,16 @@ function test(ast) {
 		`);
 
 	} else {
+		++stack_size;
 		const left = test(root.left);
 		const right = test(root.right);
+
 		return trim(`
 			${left}
 			movl %eax, -${(stack_size)*4}(%ebp)
 			
 			${right}
-			${asm_instruction[root.operator]} -${store_address[store_address.length - 1]}(%ebp), %eax
+			${asm_instruction[root.operator]} -${stack_size*4}(%ebp), %eax
 		`);
 	}
 }
